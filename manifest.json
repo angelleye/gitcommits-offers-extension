@@ -1,0 +1,58 @@
+{
+  "name": "GitCommits Offers",
+  "version": "1.0",
+  "description": "This extension helps the developers to make an offer on any Git Issues",
+  "manifest_version": 2,
+  "permissions": ["declarativeContent","storage","tabs", "activeTab","<all_urls>"],
+  "background": {
+    "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
+    //"persistent": false
+  },
+  "options_page": "html/options.html",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  /*Below one will make the popup to appear on pages matching different criteria defined in init.js
+  "page_action": {
+    "default_title": "Make an Offer",
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "images/favicon-16x16.png",
+      "32": "images/favicon-32x32.png",
+      "48": "images/android-chrome-192x192.png",
+      "128": "images/android-chrome-192x192.png"
+    }
+  },*/
+  /*Below one will make the popup to appear on all pages*/
+  "browser_action": {
+    "default_title": "GitCommit Offers",
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "images/favicon-16x16.png",
+      "32": "images/favicon-32x32.png",
+      "48": "images/android-chrome-192x192.png",
+      "128": "images/android-chrome-192x192.png"
+    }
+  },
+  "icons": {
+    "16": "images/favicon-16x16.png",
+    "32": "images/favicon-32x32.png",
+    "48": "images/android-chrome-192x192.png",
+    "128": "images/android-chrome-192x192.png"
+  },
+  "content_scripts": [
+    {
+      //"matches": ["http://*.nytimes.com/*"],
+      "matches": ["http://gitworkdone.test/extension-token"],
+      //"css": ["myStyles.css"],
+      "js": ["assets/js/contentScript.js"],
+      "run_at": "document_end"
+      //"run_at": "document_idle"
+    }
+  ],
+  "externally_connectable": {
+    "matches": ["*://*.gitworkdone.test/*"]
+  },
+  "web_accessible_resources": [
+    "assets/images/gitcommits-logo-topdown.png",
+    "pagescript.js"
+  ]
+}

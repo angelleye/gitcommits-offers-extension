@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitCommits Offers</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+    <div id="app">
+        <div v-if="isLoggedIn">
+            <div class="loggedin_user_row">
+                <div>Hello {{user.username}}, <span class="logoutbtn float-right" v-on:click="logoutUser">Logout</span></div>
+            </div>
+            <div class="m-1" v-html="error_message"></div>
+            <make-an-offer></make-an-offer>
+        </div>
+        <div class="" v-else>
+            <login-screen></login-screen>
+            <div class="m-1" v-html="error_message"></div>
+        </div>
+    </div>
+    <script src="/variables.js"></script>
+    <script src="/assets/js/jquery.min.js"></script>
+
+    <script src="/assets/js/axios.min.js"></script>
+    <!--<script src="/assets/js/vue.js"></script>-->
+    <script src="/assets/js/auth_helper.js"></script>
+    <!--<script src="/assets/js/popup.js"></script>-->
+    <script src="/dist/popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+
+@font-face {
+    font-family: 'Montserrat-Light';
+    src: url('../fonts/Montserrat/Montserrat-Light.eot');
+    src: url('../fonts/Montserrat/Montserrat-Light.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Montserrat/Montserrat-Light.woff') format('woff'),
+    url('../fonts/Montserrat/Montserrat-Light.ttf') format('truetype'),
+    url('../fonts/Montserrat/Montserrat-Light.svg#Montserrat-Light') format('svg');
+}
+
+body{
+    font-family: 'Montserrat-Light';
+    font-size: 13px;
+}
+#app{
+    width: 400px;
+    height: 400px;
+}
+.login_window .logo{
+    text-align: center;
+    margin: 20px auto;
+}
+.login_window .logo img{
+    max-height: 60px;
+}
+.btn {
+    font-family: 'Montserrat-Light';
+    font-size: 13px;
+}
+.login_window p {
+    margin-bottom: 5px;
+}
+.loggedin_user_row {
+    padding: 5px;
+    background: #000;
+    color: #fff;
+}
+.logoutbtn{
+    cursor: pointer;
+    color: #fcfcfc;
+}
+.form-control{
+    font-size: 0.8rem;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    background-color: #333;
+    display: inline-block;
+    border-radius: 100%;
+    -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+    animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-scaleout {
+    0% { -webkit-transform: scale(0) }
+    100% {
+        -webkit-transform: scale(1.0);
+        opacity: 0;
+    }
+}
+
+@keyframes sk-scaleout {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    } 100% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+          opacity: 0;
+      }
+}
