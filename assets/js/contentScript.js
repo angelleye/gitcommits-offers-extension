@@ -30,9 +30,13 @@ setTimeout(function () {
             },200);
         }else if(message.action === 'auth_response') {
             /**
-             * fire an event to the pagescript
+             * fire an event to the pagescript - for firefox due to cross origin it's not allowing to share messages, thats why 2 different listeners for now
              */
-            let event = new CustomEvent('EXT_PAGE_MESSAGE_LISTENER', {'detail': message});
+
+            if(message.loggedin)
+                var event = new CustomEvent('EXT_PAGE_AUTH_LISTENER', {'detail': message});
+            else
+                var event = new CustomEvent('EXT_PAGE_AUTH_FAILED_LISTENER', {'detail': message});
             window.dispatchEvent(event);
             console.log(message.action+' event dispatched');
         }

@@ -54,5 +54,12 @@
   "web_accessible_resources": [
     "assets/images/gitcommits-logo-topdown.png",
     "pagescript.js"
-  ]
+  ],
+
+  /*Specific for mozilla firefox*/
+  "applications": {
+    "gecko": {
+      "id": "support@gitcommits.com"
+    }
+  }
 }
