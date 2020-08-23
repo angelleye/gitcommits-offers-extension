@@ -1,9 +1,9 @@
 {
-  "name": "GitCommits Offers",
+  "name": "GitOffers by GitCommits",
   "version": "1.0",
   "description": "This extension helps the developers to make an offer on any Git Issues",
   "manifest_version": 2,
-  "permissions": ["declarativeContent","storage","tabs", "activeTab","<all_urls>"],
+  "permissions": ["declarativeContent","storage","tabs", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://*gitworkdone.test/*"],
   "background": {
     "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
     //"persistent": false
@@ -23,7 +23,7 @@
   },*/
   /*Below one will make the popup to appear on all pages*/
   "browser_action": {
-    "default_title": "GitCommit Offers",
+    "default_title": "GitOffers by GitCommits",
     "default_popup": "html/popup.html",
     "default_icon": {
       "16": "images/favicon-16x16.png",
@@ -41,7 +41,7 @@
   "content_scripts": [
     {
       //"matches": ["http://*.gitcommits.com/*"],
-      "matches": ["https://sandbox.app.gitcommits.com/extension-token"],
+      "matches": ["*://sandbox.app.gitcommits.com/extension-token","*://app.gitcommits.com/extension-token","*://gitworkdone.test/extension-token"],
       //"css": ["myStyles.css"],
       "js": ["assets/js/contentScript.js"],
       "run_at": "document_end"
@@ -49,7 +49,7 @@
     }
   ],
   "externally_connectable": {
-    "matches": ["*://*.gitcommits.com/*"]
+    "matches": ["*://*.gitcommits.com/*","*://gitworkdone.test/*"]
   },
   "web_accessible_resources": [
     "assets/images/gitcommits-logo-topdown.png",
