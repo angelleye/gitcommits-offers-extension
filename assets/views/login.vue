@@ -4,11 +4,8 @@
             <img class="responsive" src="/assets/images/gitcommits-logo-topdown.png" />
         </div>
         <div class="text-center">
-            <p>Do you want to make an offer?</p>
-            <!--<p><b>Or</b></p>
-            <p class="mb-3">You want to fund this issue?</p>-->
-            <p class="mb-4">Click the button below to create an account/login.</p>
-            <a :href="this.$parent.loginurl" target="_blank" class="btn btn-primary">Login/Signup</a>
+            <p class="m-4">Please log in to your GitCommits account in order to use this extension.</p>
+            <a :href="this.$parent.loginurl" target="_blank" class="btn btn-primary">Log In / Sign Up</a>
         </div>
     </div>
 </template>

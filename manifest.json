@@ -1,7 +1,7 @@
 {
-  "name": "GitOffers by GitCommits",
+  "name": "GitCommits",
   "version": "1.0",
-  "description": "This extension helps the developers to make an offer on any Git Issues",
+  "description": "This extension adds GitCommits functinality to your browser.",
   "manifest_version": 2,
   "permissions": ["declarativeContent","storage","tabs", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://gitcommits.test/*"],
   "background": {
