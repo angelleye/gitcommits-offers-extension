@@ -1,0 +1,46 @@
+{
+  "name": "GitCommits",
+  "version": "1.1.0",
+  "description": "This extension will allow you to submit an offer to complete work outlined in GitHub issue tickets.",
+  "manifest_version": 2,
+  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*"],
+  "background": {
+    "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "browser_action": {
+    "default_title": "GitCommits",
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "images/favicon-16x16.png",
+      "32": "images/favicon-32x32.png",
+      "48": "images/android-chrome-192x192.png",
+      "128": "images/android-chrome-192x192.png"
+    }
+  },
+  "icons": {
+    "16": "images/favicon-16x16.png",
+    "32": "images/favicon-32x32.png",
+    "48": "images/android-chrome-192x192.png",
+    "128": "images/android-chrome-192x192.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://app.gitcommits.com/extension-token"],
+      "js": ["assets/js/contentScript.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "externally_connectable": {
+    "matches": ["*://*.gitcommits.com/*"]
+  },
+  "web_accessible_resources": [
+    "assets/images/gitcommits-logo-topdown.png",
+    "pagescript.js"
+  ],
+  "applications": {
+    "gecko": {
+      "id": "support@gitcommits.com"
+    }
+  }
+}
