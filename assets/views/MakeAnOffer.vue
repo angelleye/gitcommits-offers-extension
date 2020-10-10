@@ -7,24 +7,27 @@
             <div v-else-if="showForm">
                 <form id="makeofferform" class="col-md-12 pt-2" @submit.prevent="submitOffer">
                     <input class="form-control" name="git_title" v-bind:value="formvalues.git_title" type="hidden"/>
-                    <input class="form-control" name="git_desc" v-bind:value="formvalues.git_desc" type="hidden"/>
+                    <textarea class="form-control" name="git_desc" v-bind:value="formvalues.git_desc" style="display: none"></textarea>
                     <input class="form-control" name="issue_url" v-bind:value="formvalues.issue_url" type="hidden"/>
 
-                    <h5 class="text-center">Make an Offer</h5>
+                    <div class="make-an-offer-heading">
+                        <img src="/assets/images/money-icon.png" class="mr-3" />
+                        <p class="m-0">Make an Offer:<br>Take your best shot!</p>
+                    </div>
                     <div class="form-group">
-                        <label>Your Message</label>
-                        <textarea class="form-control" name="your_comment" v-model="formvalues.your_comment"></textarea>
+                        <label class="form-label">Please type your message to the Product Owner.</label>
+                        <textarea placeholder="Enter your Message" class="form-control" name="your_comment" v-model="formvalues.your_comment"></textarea>
                     </div>
 
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">$</span>
                         </div>
-                        <input type="text" class="form-control" placeholder="Amount" aria-label="Amount" aria-describedby="basic-addon1" name="amount" v-model="formvalues.amount">
+                        <input type="text" class="form-control" placeholder="Enter Offer Amount" aria-label="Amount" aria-describedby="basic-addon1" name="amount" v-model="formvalues.amount">
                     </div>
 
                     <div class="form-group">
-                        <input type="submit" class="btn btn-primary" value="Submit Offer"/>
+                        <input type="submit" class="btn btn-primary" value="Submit Offer >"/>
                     </div>
                 </form>
             </div>
@@ -32,9 +35,9 @@
 
             </div>
         </div>
-        <div v-else>
-            <div class="alert alert-danger m-1">You can make an offer only on git issues.</div>
-        </div>
+        <template v-else>
+            <div class="alert alert-orange">You can make an offer only on Git Issues</div>
+        </template>
     </div>
 </template>
 
@@ -97,15 +100,13 @@
                 let issue_title = html.find('.gh-header-title .js-issue-title').html();
                 if(typeof issue_title!=='undefined') {
                     this.formvalues.git_title = issue_title.trim();
-                    this.formvalues.git_desc = html.find('textarea[name="issue[body]"]').val();
+                    this.formvalues.git_desc = html.find('#discussion_bucket .js-discussion>.TimelineItem .js-comment-body').html();
                 }else {
                     this.markUnknownGitIssue();
                 }
             },
             isGitIssue(issue_url, url_parts){
                 let gitIssue = false;
-                console.log(url_parts.hostname==='github.com' || url_parts.hostname==='www.github.com');
-                console.log(url_parts.branch==='issues' && url_parts.owner!=='' && url_parts.name!=='' && url_parts.filepath!=='');
                 if(url_parts.hostname==='github.com' || url_parts.hostname==='www.github.com'){
                     if(url_parts.branch==='issues' && url_parts.owner!=='' && url_parts.name!=='' && url_parts.filepath!==''){
                         gitIssue = true;
@@ -139,9 +140,15 @@
                     }else{
                         var bounty_url = '';
                         if(typeof issuestat.bounty_url !== 'undefined'){
-                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">View Bounty</a></div>';
+                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">View Bounty > </a></div>';
                         }
-                        thisobj.error_message = '<div class="alert alert-info">'+issuestat.message+'</div>'+bounty_url;
+                        if(typeof issuestat.offer_url !== 'undefined')
+                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">Counter Offer > </a></div>';
+
+                        if(issuestat.offer && typeof issuestat.offer.offer_status !== 'undefined' && issuestat.offer.offer_status=="rejected")
+                            thisobj.error_message = '<div class="alert alert-orange">'+issuestat.message+'</div>'+bounty_url;
+                        else
+                            thisobj.error_message = '<div class="alert alert-info">'+issuestat.message+'</div>'+bounty_url;
                     }
                 }).catch(function (error) {
                     thisobj.error_message = error.htmlerrormsg;
@@ -164,23 +171,22 @@
                 var thisobj= this;
 
                 if (this.formvalues.git_title==="" || typeof this.formvalues.git_title==='undefined') {
-                    form_errors.push('We are unable to detect the issue title.');
+                    form_errors.push('We are unable to detect the issue title');
                 }
 
-                if (this.formvalues.git_desc==="" || typeof this.formvalues.git_desc==='undefined') {
-                    form_errors.push('We are unable to detect the issue description.');
-                }
+                /*if (this.formvalues.git_desc==="" || typeof this.formvalues.git_desc==='undefined') {
+                    form_errors.push('We are unable to detect the issue description');
+                }*/
 
                 if (this.formvalues.your_comment==="" || typeof this.formvalues.your_comment==='undefined') {
-                    form_errors.push('Please enter your message to the funder.');
+                    form_errors.push('Please enter your message to the funder');
                 }
 
                 let priceamt = parseFloat(this.formvalues.amount);
-                if (this.formvalues.amount==="" || typeof this.formvalues.amount==='undefined' || priceamt<10) {
-                    form_errors.push('Please enter a price more than $10');
+                if (this.formvalues.amount==="" || typeof this.formvalues.amount==='undefined' || priceamt<0) {
+                    form_errors.push('Please enter a valid offer amount');
                 }
 
-                console.log(this.formvalues,form_errors);
                 if(form_errors.length) {
                     this.error_message = '<div class="alert alert-danger">';
                     for(var i=0;i< form_errors.length;i++){
@@ -201,7 +207,7 @@
                         let res = response.data;
                         if(res.status){
                             thisobj.showForm=false;
-                            thisobj.error_message = "<div class='alert alert-success'>"+res.message+"</div>";
+                            thisobj.error_message = "<div class='alert alert-info'>"+res.message+"</div>";
                         }else {
                             thisobj.error_message = "<div class='alert alert-danger'>"+res.message+"</div>";
                         }
@@ -219,4 +225,5 @@
 </script>
 
 <style scoped>
+
 </style>

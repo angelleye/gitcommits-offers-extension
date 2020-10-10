@@ -1,9 +1,9 @@
 {
   "name": "GitCommits",
-  "version": "1.0",
-  "description": "This extension adds GitCommits functinality to your browser.",
+  "version": "1.1.0",
+  "description": "This extension will allow you to submit an offer to complete work outlined in GitHub issue tickets.",
   "manifest_version": 2,
-  "permissions": ["declarativeContent","storage","tabs", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://gitcommits.test/*"],
+  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://gitcommits.test/*"],
   "background": {
     "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
     //"persistent": false
@@ -23,7 +23,7 @@
   },*/
   /*Below one will make the popup to appear on all pages*/
   "browser_action": {
-    "default_title": "GitOffers by GitCommits",
+    "default_title": "GitCommits",
     "default_popup": "html/popup.html",
     "default_icon": {
       "16": "images/favicon-16x16.png",
@@ -49,7 +49,7 @@
     }
   ],
   "externally_connectable": {
-    "matches": ["*://*.gitcommits.com/*","*://gitworkdone.test/*"]
+    "matches": ["*://*.gitcommits.com/*","*://gitcommits.test/*"]
   },
   "web_accessible_resources": [
     "assets/images/gitcommits-logo-topdown.png",

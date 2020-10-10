@@ -1,46 +1,52 @@
 
-@font-face {
-    font-family: 'Montserrat-Light';
-    src: url('../fonts/Montserrat/Montserrat-Light.eot');
-    src: url('../fonts/Montserrat/Montserrat-Light.eot?#iefix') format('embedded-opentype'),
-    url('../fonts/Montserrat/Montserrat-Light.woff') format('woff'),
-    url('../fonts/Montserrat/Montserrat-Light.ttf') format('truetype'),
-    url('../fonts/Montserrat/Montserrat-Light.svg#Montserrat-Light') format('svg');
+*{
+    outline: none;
+    box-sizing: border-box;
 }
-
 body{
-    font-family: 'Montserrat-Light', serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 13px;
 }
 #app{
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 500px;
 }
 .login_window .logo{
     text-align: center;
-    margin: 20px auto;
+    margin: 50px auto 70px;
 }
 .login_window .logo img{
-    max-height: 160px;
+    max-width: 220px;
 }
 .btn {
-    font-family: 'Montserrat-Light', serif;
-    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 30px;
+    border-radius: 0;
 }
 .login_window p {
     margin-bottom: 5px;
 }
 .loggedin_user_row {
-    padding: 5px;
-    background: #000;
+    padding: 20px;
+    background: #102B4E;
     color: #fff;
+    font-family: 'IBM Plex Mono';
 }
 .logoutbtn{
     cursor: pointer;
     color: #fcfcfc;
 }
 .form-control{
-    font-size: 0.8rem;
+    border: 1px solid #666666;
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 21px;
+    color: #102B4E;
+    border-radius: 0;
 }
 
 .spinner {
@@ -70,4 +76,63 @@ body{
           transform: scale(1.0);
           opacity: 0;
       }
+}
+
+.alert{
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 24px;
+    border-radius: 0;
+    text-align: center;
+    padding: 20px;
+    border: 0;
+}
+.alert-orange{
+    background: #F58221;
+    color: #fff;
+}
+.alert-info{
+    background: #6BAADB;
+    color: #fff;
+}
+.make-an-offer-heading{
+    display: flex;
+    align-items: center;
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    color: #102B4E;
+    border-bottom: 1px solid #102B4E;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+.form-label{
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 23px;
+    color: #102B4E;
+
+}
+.input-group-text{
+    background: #666666;
+    border: 1px solid #666666;
+    color: #fff;
+}
+
+.btn-primary{
+    background: #102B4E;
+    color: #fff;
+    font-size: 18px;
+    line-height: 23px;
+    padding: 15px 40px;
+}
+.btn-primary:hover{
+    background: #fff;
+    color: #666;
 }
