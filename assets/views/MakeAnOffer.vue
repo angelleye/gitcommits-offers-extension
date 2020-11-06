@@ -143,7 +143,7 @@
                             bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">View Bounty > </a></div>';
                         }
                         if(typeof issuestat.offer_url !== 'undefined')
-                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">Counter Offer > </a></div>';
+                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.offer_url+'">Counter Offer > </a></div>';
 
                         if(issuestat.offer && typeof issuestat.offer.offer_status !== 'undefined' && issuestat.offer.offer_status=="rejected")
                             thisobj.error_message = '<div class="alert alert-orange">'+issuestat.message+'</div>'+bounty_url;
@@ -203,7 +203,7 @@
                     http.post('/make-an-offer/submit-offer', serialize,{
 
                     }).then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         let res = response.data;
                         if(res.status){
                             thisobj.showForm=false;
@@ -212,7 +212,7 @@
                             thisobj.error_message = "<div class='alert alert-danger'>"+res.message+"</div>";
                         }
                     }).catch(function(error) {
-                        console.log(error);
+                        //console.log(error);
                         thisobj.$parent.error_message = (error.htmlerrormsg).replace(/\n/g, "<br />");
                     }).then(function () {
                         submitbtn.html(loadingText).attr('disabled', false);
