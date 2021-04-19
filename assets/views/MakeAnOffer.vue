@@ -4,7 +4,8 @@
             <div class="text-center" v-if="isCheckingStatus">
                 <div class="spinner"></div><br>Please wait loading details...
             </div>
-            <div v-else-if="showForm">
+            <div v-show="internalErrorMessage != '' && internalErrorMessage!=null" class="p-3 pb-0" v-html="internalErrorMessage"></div>
+            <div v-if="showForm">
                 <form id="makeofferform" class="col-md-12 pt-2" @submit.prevent="submitOffer">
                     <input class="form-control" name="git_title" v-bind:value="formvalues.git_title" type="hidden"/>
                     <textarea class="form-control" name="git_desc" v-bind:value="formvalues.git_desc" style="display: none"></textarea>
@@ -30,9 +31,6 @@
                         <input type="submit" class="btn btn-primary" value="Submit Offer >"/>
                     </div>
                 </form>
-            </div>
-            <div v-else>
-
             </div>
         </div>
         <template v-else>
@@ -61,7 +59,8 @@
                     amount: '',
                     issue_url: ''
                 },
-                error_message: ''
+                error_message: '',
+                internalErrorMessage: null
             }
         },
         mounted(){
@@ -129,7 +128,7 @@
                     console.log(issuestat);
                     if(issuestat.can_make_offer==='yes'){
                         if(issuestat.message!=='')
-                            thisobj.error_message = '<div class="alert alert-info">'+issuestat.message+'</div>';
+                           thisobj.internalErrorMessage = '<div class="alert alert-info mb-0">'+issuestat.message+'</div>';
                         thisobj.isCheckingStatus = false;
                         thisobj.showForm = true;
                         thisobj.formvalues.issue_url = thisobj.current_tab_url;

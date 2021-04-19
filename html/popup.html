@@ -12,7 +12,7 @@
         <div class="loggedin_user_row">
             <div>Hello {{user.username}}, <span class="logoutbtn float-right" v-on:click="logoutUser">Logout ></span></div>
         </div>
-        <div v-show="error_message != '' && error_message!=null" class="m-1" v-html="error_message"></div>
+        <div v-show="error_message != '' && error_message!=null" class="p-3 centered-alert" v-html="error_message"></div>
         <div class="p-3"><make-an-offer></make-an-offer></div>
     </div>
     <div class="" v-else>

@@ -136,3 +136,11 @@ body{
     background: #fff;
     color: #666;
 }
+.centered-alert{
+    position: absolute;
+    height: calc(100% - 59px);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
