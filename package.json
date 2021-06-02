@@ -13,11 +13,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "laravel-mix": "^6.0.16",
+    "laravel-mix": "^6.0.19",
     "node-forge": ">=0.10.0",
-    "vue": "^2.6.12",
-    "vue-loader": "^15.9.6",
-    "vue-template-compiler": "^2.6.12"
+    "vue": "^2.6.13",
+    "vue-loader": "^15.9.7",
+    "vue-template-compiler": "^2.6.13"
   },
   "dependencies": {
     "lodash": "^4.17.21",
