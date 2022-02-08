@@ -1,24 +1,30 @@
 import Vue from 'vue';
 import {store} from './js/store';
+import vSelect from 'vue-select'
 
-let vuedata = {
+let vueData = {
     projectName: 'GitCommits Offers',
     isLoggedIn: false,
-    loginurl: OPTIONS.baseurl+'/extension-token',
+    siteUrl: OPTIONS.baseurl,
+    apiUrl: OPTIONS.apiurl,
+    loginUrl: OPTIONS.baseurl+'/extension-token',
     user: null,
     error_message: ''
 };
 
-vuedata = {...vuedata, ...OPTIONS };
+vueData = {...vueData, ...OPTIONS };
 
 //import LoginScreen from './views/login.vue'
+Vue.component('v-select', vSelect)
 Vue.component('login-screen', require('./views/login.vue').default);
+Vue.component('gitcommits-menu', require('./views/Menu.vue').default);
 Vue.component('make-an-offer', require('./views/MakeAnOffer.vue').default);
+Vue.component('post-bounty', require('./views/PostBounty.vue').default);
 
 
 var app = new Vue({
     el: '#app',
-    data: vuedata,
+    data: vueData,
     async created(){
         var logged = await isLoggedIn(this.loggedInCallback);
         console.log('logged',logged,this.isLoggedIn);

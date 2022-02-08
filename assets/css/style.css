@@ -144,3 +144,10 @@ body{
     flex-direction: column;
     justify-content: center;
 }
+
+.form-control.v-select {
+    padding: 3px
+}
+.form-control .vs__dropdown-toggle {
+    border: none
+}

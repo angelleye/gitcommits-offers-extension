@@ -11,7 +11,8 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('assets/popup.js', 'dist/').vue();
+mix.js('assets/popup.js', 'dist/').vue()
+    .sass('assets/css/dynamic.sass', 'dist/css');
 
 // Full API
 // mix.js(src, output);

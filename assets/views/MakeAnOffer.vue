@@ -40,11 +40,14 @@
 </template>
 
 <script>
-    var gh = require('parse-github-url');
     import http from './../js/http';
 
     export default {
         name: "MakeAnOffer",
+        props: {
+            gitUrl: String,
+            urlParts: Object
+        },
         data(){
             return {
                 current_tab_url: '',
@@ -63,28 +66,13 @@
                 internalErrorMessage: null
             }
         },
-        mounted(){
-            var thisobj = this;
-
-            chrome.tabs.query({'active': true, 'lastFocusedWindow': true, 'currentWindow': true}, function (tabs) {
-                if(typeof tabs[0] === 'undefined'){
-                    thisobj.isGitIssuePage = false;
-                    return;
-                }else {
-                    var url = tabs[0].url;
-                    //var url = 'https://github.com/angelleye/GitWorkDone/issues/1';
-                    thisobj.current_tab_url = url;
-                    thisobj.parsed_url = gh(url);
-                    thisobj.isGitIssue(url, thisobj.parsed_url);
-                    if (thisobj.isGitIssuePage) {
-                        thisobj.checkGitIssueStatus(url);
-                    } else {
-                        thisobj.isCheckingStatus = false;
-                    }
-                }
-            });
-
-
+        created () {
+            if (this.urlParts.branch === 'issues' && this.urlParts.owner !== '' && this.urlParts.name !== '' && this.urlParts.filepath !== '') {
+                this.isGitIssuePage = true;
+                this.checkGitIssueStatus(this.gitUrl);
+            } else {
+                this.isCheckingStatus = false;
+            }
         },
         watch:{
             error_message: function(newval, oldval){
@@ -94,7 +82,7 @@
         },
         methods:{
             parsePageDocument(results){
-                var html = results[0];
+                let html = results[0];
                 html = $(html);
                 let issue_title = html.find('.gh-header-title .js-issue-title').html();
                 if(typeof issue_title!=='undefined') {
@@ -104,15 +92,6 @@
                     this.markUnknownGitIssue();
                 }
             },
-            isGitIssue(issue_url, url_parts){
-                let gitIssue = false;
-                if(url_parts.hostname==='github.com' || url_parts.hostname==='www.github.com'){
-                    if(url_parts.branch==='issues' && url_parts.owner!=='' && url_parts.name!=='' && url_parts.filepath!==''){
-                        gitIssue = true;
-                    }
-                }
-                this.isGitIssuePage = gitIssue;
-            },
             checkGitIssueStatus(issue_url){
                 function getHtmlDom() {
                     return document.getElementsByTagName('html')[0].innerHTML;
@@ -121,7 +100,7 @@
                 this.error_message = '';
                 var thisobj = this;
                 thisobj.isCheckingStatus = true;
-                http.post(OPTIONS.apiurl+'/make-an-offer/git-issue-status', {
+                http.post(OPTIONS.apiurl + '/make-an-offer/git-issue-status', {
                     issue_url: issue_url
                 }).then((response) => {
                     let issuestat = response.data;
