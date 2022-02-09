@@ -7,8 +7,8 @@
     <br><br>
     <p>If you've already connected your account, please <a :href="this.$root.loginUrl" target="_blank">click here</a> to re-sync your account.</p>
   </div>
-  <div v-else-if="!isJiraIssue">
-    <div class="alert alert-orange">You can post a bounty only on Jira Issues</div>
+  <div v-else-if="!isJiraIssue && !isGitIssue">
+    <div class="alert alert-orange">You can post a bounty only on Jira/Git Issues</div>
   </div>
   <div v-else-if="failedToDetect">
     <div class="alert alert-orange">We're unable to parse Jira Issue, Please make sure you are on Jira Issue Detail Page.</div>
@@ -36,66 +36,75 @@
         <p class="m-0">Post Bounty:<br>Take your best shot!</p>
       </div>
       <div class="alert alert-orange" v-if="errorMessage">{{ errorMessage }}</div>
-      <div class="form-group">
-        <label class="form-label"><input type="radio" v-model="form.gitIssueAction" value="new"> Create a new Git Issue</label><br>
-        <label class="form-label"><input type="radio" v-model="form.gitIssueAction" value="existing"> Select existing Git Issue</label>
-      </div>
-      <div class="form-group" v-if="form.gitIssueAction == 'new'">
-        <label class="form-label">Select a Repository</label>
-        <div v-if="isLoading">
-          <select class="form-control">
-            <option>Loading Repositories List...</option>
-          </select>
+      <div v-if="isJiraIssue">
+        <div class="form-group">
+          <label class="form-label"><input type="radio" v-model="form.gitIssueAction" value="new"> Create a new Git Issue</label><br>
+          <label class="form-label"><input type="radio" v-model="form.gitIssueAction" value="existing"> Select existing Git Issue</label>
         </div>
-        <v-select v-else class="custom-select2 form-control" label="full_name" :options="repoList"
-                  id="field-issue" aria-describedby="field-issue-feedback" required
-                  :reduce="repo => repo"
-                  placeholder="Select a Repository"
-                  v-on:input="repoChanged">
-          <template #search="{attributes, events}">
-            <input
-                class="vs__search"
-                v-bind="attributes"
-                v-on="events"
-            />
-          </template>
-          <template v-slot:no-options="{ search, searching }">
-            <template v-if="searching">
-              No results found for <em>{{ search }}</em>.
+        <div class="form-group" v-if="form.gitIssueAction == 'new'">
+          <label class="form-label">Select a Repository</label>
+          <div v-if="isLoading">
+            <select class="form-control">
+              <option>Loading Repositories List...</option>
+            </select>
+          </div>
+          <v-select v-else class="custom-select2 form-control" label="full_name" :options="repoList"
+                    id="field-issue" aria-describedby="field-issue-feedback" required
+                    :reduce="repo => repo"
+                    placeholder="Select a Repository"
+                    v-on:input="repoChanged">
+            <template #search="{attributes, events}">
+              <input
+                  class="vs__search"
+                  v-bind="attributes"
+                  v-on="events"
+              />
             </template>
-            <em style="opacity: 0.5;" v-else>Start typing to search for a Git Repository.</em>
-          </template>
-        </v-select>
+            <template v-slot:no-options="{ search, searching }">
+              <template v-if="searching">
+                No results found for <em>{{ search }}</em>.
+              </template>
+              <em style="opacity: 0.5;" v-else>Start typing to search for a Git Repository.</em>
+            </template>
+          </v-select>
 
-        <div :class="'error-message' + (checkFieldError('repoName') ? '' : ' d-none')">
-          {{ checkFieldError('repoName', 'message') }}
+          <div :class="'error-message' + (checkFieldError('repoName') ? '' : ' d-none')">
+            {{ checkFieldError('repoName', 'message') }}
+          </div>
+        </div>
+        <div class="form-group" v-if="form.gitIssueAction == 'existing'">
+          <label class="form-label">Select a Git Issue</label>
+          <div v-if="isLoading">
+            <select class="form-control">
+              <option>Loading Issues...</option>
+            </select>
+          </div>
+          <v-select v-else class="custom-select2 form-control" label="title" :options="gitIssues"
+                    id="field-issue" aria-describedby="field-issue-feedback" required
+                    placeholder="Select a Git Issue"
+                    v-on:input="issueChanged">
+            <template #search="{attributes, events}">
+              <input
+                  class="vs__search"
+                  v-bind="attributes"
+                  v-on="events"
+              />
+            </template>
+            <template v-slot:no-options="{ search, searching }">
+              <template v-if="searching">
+                No results found for <em>{{ search }}</em>.
+              </template>
+              <em style="opacity: 0.5;" v-else>Start typing to search for a Git Issue.</em>
+            </template>
+          </v-select>
+          <div :class="'error-message' + (checkFieldError('issueUrl') ? '' : ' d-none')">
+            {{ checkFieldError('issueUrl', 'message') }}
+          </div>
         </div>
       </div>
-      <div class="form-group" v-if="form.gitIssueAction == 'existing'">
-        <label class="form-label">Select a Git Issue</label>
-        <div v-if="isLoading">
-          <select class="form-control">
-            <option>Loading Issues...</option>
-          </select>
-        </div>
-        <v-select v-else class="custom-select2 form-control" label="title" :options="gitIssues"
-                  id="field-issue" aria-describedby="field-issue-feedback" required
-                  placeholder="Select a Git Issue"
-                  v-on:input="issueChanged">
-          <template #search="{attributes, events}">
-            <input
-                class="vs__search"
-                v-bind="attributes"
-                v-on="events"
-            />
-          </template>
-          <template v-slot:no-options="{ search, searching }">
-            <template v-if="searching">
-              No results found for <em>{{ search }}</em>.
-            </template>
-            <em style="opacity: 0.5;" v-else>Start typing to search for a Git Issue.</em>
-          </template>
-        </v-select>
+      <div v-else class="form-group">
+        <label class="form-label">Git Issue Url</label>
+        <input class="form-control" disabled v-model="form.issueUrl" placeholder="Git Issue Url" type="text"/>
         <div :class="'error-message' + (checkFieldError('issueUrl') ? '' : ' d-none')">
           {{ checkFieldError('issueUrl', 'message') }}
         </div>
@@ -178,16 +187,23 @@
 </template>
 <script>
 import http from './../js/http';
-import TurndownService from 'turndown';
+import HtmlParser from './../js/HtmlParser';
 export default {
   name: "PostBounty",
   props: {
     tabUrl: String,
-    urlParts: Object
+    urlParts: Object,
+    type: String
   },
   computed: {
     isJiraIssue: function () {
       if (this.urlParts.owner == 'browse' && this.urlParts.name !== '') {
+        return true;
+      }
+      return false;
+    },
+    isGitIssue: function () {
+      if (this.type == 'github') {
         return true;
       }
       return false;
@@ -229,31 +245,39 @@ export default {
     }
   },
   created() {
-    if (this.isJiraIssue) {
-      this.fetchRepoList();
-      function getHtmlDom() {
-        return document.getElementsByTagName('html')[0].innerHTML;
-      }
-      /**
-       * Gets the values from git issue page
-       */
-      chrome.tabs.executeScript( null, {code: '(' + getHtmlDom + ')();'}, this.parsePageDocument );
+    function getHtmlDom() {
+      return document.getElementsByTagName('html')[0].innerHTML;
     }
+    if (this.type == 'github') {
+      this.form.issueUrl = this.tabUrl;
+      this.form.gitIssueAction = 'existing';
+    } else if (this.isJiraIssue) {
+      this.fetchRepoList();
+    }
+    /**
+     * Gets the values from git issue page
+     */
+    chrome.tabs.executeScript( null, {code: '(' + getHtmlDom + ')();'}, this.parsePageDocument );
   },
   methods: {
     parsePageDocument(results){
       let html = results[0];
-      html = $(html);
-      let title = html.find('[data-test-id="issue.views.issue-base.foundation.summary.heading"]').html();
-      let description = html.find('.ak-renderer-document').html();
-      if(typeof title !== 'undefined' && typeof description !== 'undefined') {
-        this.form.title = this.urlParts.name + ' - ' + title.trim();
-        let turndownService = new TurndownService({ headingStyle: 'atx' })
-        let markdown = turndownService.turndown(description);
-        this.form.desc = markdown;
+      if (this.isJiraIssue) {
+        let jiraData = (new HtmlParser()).parseJiraIssue(html);
+        if (jiraData) {
+          this.form.title = this.urlParts.name + ' - ' + jiraData.title;
+          this.form.desc = jiraData.desc;
+          return;
+        }
       } else {
-        this.failedToDetect = true;
+        let gitData = (new HtmlParser()).parseGitIssue(html);
+        if (gitData) {
+          this.form.title = gitData.title;
+          this.form.desc = gitData.desc;
+          return;
+        }
       }
+      this.failedToDetect = true;
     },
     fetchGitIssues(loadFrom = 'reload') {
       this.isLoading = true;
