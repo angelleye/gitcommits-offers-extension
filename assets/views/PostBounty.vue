@@ -4,8 +4,8 @@
     <p class="mt-4 mb-5 make-an-offer-text">Please connect your PayPal account<br>to Post a Bounty. <br>
       Click below button to open Integrations.</p>
     <a :href="this.$root.siteUrl + '/user/integrations'" target="_blank" class="btn btn-primary">Open Integrations</a>
-    <br>
-    <p>If you already connected your account, please <a :href="this.$root.loginUrl" target="_blank">click here</a> to logout and login again</p>
+    <br><br>
+    <p>If you've already connected your account, please <a :href="this.$root.loginUrl" target="_blank">click here</a> to re-sync your account.</p>
   </div>
   <div v-else-if="!isJiraIssue">
     <div class="alert alert-orange">You can post a bounty only on Jira Issues</div>
@@ -14,7 +14,22 @@
     <div class="alert alert-orange">We're unable to parse Jira Issue, Please make sure you are on Jira Issue Detail Page.</div>
   </div>
   <div v-else>
-    <div v-show="!showForm" v-html="errorMessage"></div>
+    <div v-show="!showForm">
+      <div v-html="errorMessage"></div>
+      <div v-if="postedBountyUrl">
+        <div class="text-center"><a :href="postedBountyUrl" target="_blank" class="btn btn-primary">View Bounty</a><br><br>OR<br><br></div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Bounty Url" disabled v-model="postedBountyUrl" aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <div class="dmg-tooltip">
+              <button @focusout="clipboardHint=null" class="btn btn-secondary" @click="copyUrl">
+                <span class="tooltiptext" id="myTooltip">{{clipboardHint ? clipboardHint : 'Copy Url'}}</span> Copy Url
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <form v-show="showForm" id="post_bounty_form" class="col-md-12 pt-2" @submit.prevent="postBounty">
       <div class="make-an-offer-heading">
         <img src="/assets/images/money-icon.png" class="mr-3" />
@@ -197,6 +212,8 @@ export default {
       formErrors: {},
       showForm: true,
       formProcessing: false,
+      postedBountyUrl: null,
+      clipboardHint: null,
       form: {
         gitIssueAction: 'new',
         issueUrl: '',
@@ -323,6 +340,7 @@ export default {
         let res = response.data;
         if (res.status) {
           this.showForm = false;
+          this.postedBountyUrl = res.issue_url
           this.errorMessage = "<div class='alert alert-info'>" + res.message + "</div>";
         } else {
           this.errorMessage = res.message;
@@ -363,6 +381,10 @@ export default {
         this.form.issueUrl = issue.url;
         this.form.containsPrivateIssues = issue.private;
       }
+    },
+    copyUrl () {
+      this.clipboardHint = 'Url Copied';
+      navigator.clipboard.writeText(this.postedBountyUrl);
     }
   }
 }
