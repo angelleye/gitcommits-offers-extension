@@ -23,7 +23,7 @@
           <div class="input-group-append">
             <div class="dmg-tooltip">
               <button @focusout="clipboardHint=null" class="btn btn-secondary" @click="copyUrl">
-                <span class="tooltiptext" id="myTooltip">{{clipboardHint ? clipboardHint : 'Copy Url'}}</span> Copy Url
+                <span class="tooltiptext" id="myTooltip">{{clipboardHint ? clipboardHint : 'Copy Url'}}</span> <img src="/assets/images/copy-icon.png">
               </button>
             </div>
           </div>
