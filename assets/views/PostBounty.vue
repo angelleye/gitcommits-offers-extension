@@ -265,7 +265,7 @@ export default {
       if (this.isJiraIssue) {
         let jiraData = (new HtmlParser()).parseJiraIssue(html);
         if (jiraData) {
-          this.form.title = this.urlParts.name + ' - ' + jiraData.title;
+          this.form.title =  (this.urlParts.pathname).replace('browse/', '') + ' - ' + jiraData.title;
           this.form.desc = jiraData.desc;
           return;
         }
