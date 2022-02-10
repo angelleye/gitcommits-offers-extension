@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "GitCommits is a platform that brings Product Owners, Software Developers, and End Users together like never before.",
   "manifest_version": 2,
-  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://gitcommits.test/*"],
+  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*", "*://*.github.com/*", "*://*.atlassian.net/*", "*://gitcommits.test/*"],
   "background": {
     "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
     //"persistent": false

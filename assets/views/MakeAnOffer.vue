@@ -1,30 +1,30 @@
 <template>
     <div>
         <div v-if="isGitIssuePage">
+            <div v-html="errorMessage"></div>
             <div class="text-center" v-if="isCheckingStatus">
                 <div class="spinner"></div><br>Please wait loading details...
             </div>
-            <div v-show="internalErrorMessage != '' && internalErrorMessage!=null" class="p-3 pb-0" v-html="internalErrorMessage"></div>
             <div v-if="showForm">
                 <form id="makeofferform" class="col-md-12 pt-2" @submit.prevent="submitOffer">
-                    <input class="form-control" name="git_title" v-bind:value="formvalues.git_title" type="hidden"/>
-                    <textarea class="form-control" name="git_desc" v-bind:value="formvalues.git_desc" style="display: none"></textarea>
-                    <input class="form-control" name="issue_url" v-bind:value="formvalues.issue_url" type="hidden"/>
+                    <input class="form-control" name="git_title" v-bind:value="form.git_title" type="hidden"/>
+                    <textarea class="form-control" name="git_desc" v-bind:value="form.git_desc" style="display: none"></textarea>
+                    <input class="form-control" name="issue_url" v-bind:value="form.issue_url" type="hidden"/>
 
                     <div class="make-an-offer-heading">
                         <img src="/assets/images/money-icon.png" class="mr-3" />
-                        <p class="m-0">Make an Offer:<br>Take your best shot!</p>
+                        <p class="m-0">{{offerTitle}}:<br>Take your best shot!</p>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Please type your message to the Product Owner.</label>
-                        <textarea placeholder="Enter your Message" class="form-control" name="your_comment" v-model="formvalues.your_comment"></textarea>
+                        <textarea placeholder="Enter your Message" class="form-control" name="your_comment" v-model="form.your_comment"></textarea>
                     </div>
 
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">$</span>
                         </div>
-                        <input type="text" class="form-control" placeholder="Enter Offer Amount" aria-label="Amount" aria-describedby="basic-addon1" name="amount" v-model="formvalues.amount">
+                        <input type="text" class="form-control" placeholder="Enter Offer Amount" aria-label="Amount" aria-describedby="basic-addon1" name="amount" v-model="form.amount">
                     </div>
 
                     <div class="form-group">
@@ -40,125 +40,96 @@
 </template>
 
 <script>
-    var gh = require('parse-github-url');
     import http from './../js/http';
+    import HtmlParser from "../js/HtmlParser";
 
     export default {
         name: "MakeAnOffer",
+        props: {
+            gitUrl: String,
+            urlParts: Object
+        },
         data(){
             return {
-                current_tab_url: '',
+              offerTitle: 'Make an Offer',
                 parsed_url: '',
                 isGitIssuePage: false,
                 isCheckingStatus: true,
                 showForm: false,
-                formvalues: {
+                form: {
                     git_title: '',
                     git_desc: '',
                     your_comment: '',
                     amount: '',
                     issue_url: ''
                 },
-                error_message: '',
-                internalErrorMessage: null
+                errorMessage: ''
             }
         },
-        mounted(){
-            var thisobj = this;
-
-            chrome.tabs.query({'active': true, 'lastFocusedWindow': true, 'currentWindow': true}, function (tabs) {
-                if(typeof tabs[0] === 'undefined'){
-                    thisobj.isGitIssuePage = false;
-                    return;
-                }else {
-                    var url = tabs[0].url;
-                    //var url = 'https://github.com/angelleye/GitWorkDone/issues/1';
-                    thisobj.current_tab_url = url;
-                    thisobj.parsed_url = gh(url);
-                    thisobj.isGitIssue(url, thisobj.parsed_url);
-                    if (thisobj.isGitIssuePage) {
-                        thisobj.checkGitIssueStatus(url);
-                    } else {
-                        thisobj.isCheckingStatus = false;
-                    }
-                }
-            });
-
-
+        created () {
+            if (this.urlParts.branch === 'issues' && this.urlParts.owner !== '' && this.urlParts.name !== '' && this.urlParts.filepath !== '') {
+                this.isGitIssuePage = true;
+                this.checkGitIssueStatus(this.gitUrl);
+            } else {
+                this.isCheckingStatus = false;
+            }
         },
-        watch:{
-            error_message: function(newval, oldval){
-                //console.log('watch: ', newval, oldval);
-                this.$parent.error_message = newval;
-            },
-        },
-        methods:{
+        methods: {
             parsePageDocument(results){
-                var html = results[0];
-                html = $(html);
-                let issue_title = html.find('.gh-header-title .js-issue-title').html();
-                if(typeof issue_title!=='undefined') {
-                    this.formvalues.git_title = issue_title.trim();
-                    this.formvalues.git_desc = html.find('#discussion_bucket .js-discussion>.TimelineItem .js-comment-body').html();
-                }else {
-                    this.markUnknownGitIssue();
+                let html = results[0];
+                let gitData = (new HtmlParser()).parseGitIssue(html);
+                if (gitData) {
+                    this.form.git_title = gitData.title;
+                    this.form.git_desc = gitData.desc;
+                } else {
+                  this.markUnknownGitIssue();
                 }
             },
-            isGitIssue(issue_url, url_parts){
-                let gitIssue = false;
-                if(url_parts.hostname==='github.com' || url_parts.hostname==='www.github.com'){
-                    if(url_parts.branch==='issues' && url_parts.owner!=='' && url_parts.name!=='' && url_parts.filepath!==''){
-                        gitIssue = true;
-                    }
-                }
-                this.isGitIssuePage = gitIssue;
-            },
-            checkGitIssueStatus(issue_url){
+            checkGitIssueStatus (issue_url){
                 function getHtmlDom() {
                     return document.getElementsByTagName('html')[0].innerHTML;
                 }
 
-                this.error_message = '';
-                var thisobj = this;
-                thisobj.isCheckingStatus = true;
-                http.post(OPTIONS.apiurl+'/make-an-offer/git-issue-status', {
+                this.errorMessage = '';
+                this.isCheckingStatus = true;
+                http.post(OPTIONS.apiurl + '/make-an-offer/git-issue-status', {
                     issue_url: issue_url
                 }).then((response) => {
-                    let issuestat = response.data;
-                    console.log(issuestat);
-                    if(issuestat.can_make_offer==='yes'){
-                        if(issuestat.message!=='')
-                           thisobj.internalErrorMessage = '<div class="alert alert-info mb-0">'+issuestat.message+'</div>';
-                        thisobj.isCheckingStatus = false;
-                        thisobj.showForm = true;
-                        thisobj.formvalues.issue_url = thisobj.current_tab_url;
-                        if(issuestat.offer){
-                            thisobj.formvalues.amount = issuestat.offer.offer_price;
-                            thisobj.formvalues.your_comment = issuestat.offer.user_comment;
+                    let issueDetail = response.data;
+                    if (issueDetail.can_make_offer==='yes') {
+                        this.isCheckingStatus = false;
+                        this.showForm = true;
+                        this.form.issue_url = this.gitUrl;
+                        if (issueDetail.offer) {
+                          this.offerTitle = 'Update your offer';
+                            this.form.amount = issueDetail.offer.offer_price;
+                            this.form.your_comment = issueDetail.offer.user_comment;
+                        } else if (issueDetail.message) {
+                          this.errorMessage = '<div class="alert alert-info mb-2">' + issueDetail.message + '</div>';
                         }
-                    }else{
-                        var bounty_url = '';
-                        if(typeof issuestat.bounty_url !== 'undefined'){
-                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.bounty_url+'">View Bounty > </a></div>';
+                    } else {
+                        let bountyUrl = '';
+                        if (typeof issueDetail.bounty_url !== 'undefined') {
+                            bountyUrl = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issueDetail.bounty_url+'">View Bounty > </a></div>';
                         }
-                        if(typeof issuestat.offer_url !== 'undefined')
-                            bounty_url = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="'+issuestat.offer_url+'">Counter Offer > </a></div>';
-
-                        if(issuestat.offer && typeof issuestat.offer.offer_status !== 'undefined' && issuestat.offer.offer_status=="rejected")
-                            thisobj.error_message = '<div class="alert alert-orange">'+issuestat.message+'</div>'+bounty_url;
+                        if (typeof issueDetail.offer_url !== 'undefined') {
+                            bountyUrl = '<div class="text-center mx-2"><a target="_blank" class="btn btn-primary btn-sm" href="' + issueDetail.offer_url + '">Counter Offer > </a></div>';
+                        }
+                        if(issueDetail.offer && typeof issueDetail.offer.offer_status !== 'undefined' && issueDetail.offer.offer_status=="rejected")
+                            this.errorMessage = '<div class="alert alert-orange">'+issueDetail.message+'</div>' + bountyUrl;
                         else
-                            thisobj.error_message = '<div class="alert alert-info">'+issuestat.message+'</div>'+bounty_url;
+                            this.errorMessage = '<div class="alert alert-info">'+issueDetail.message+'</div>' + bountyUrl;
                     }
                 }).catch(function (error) {
-                    thisobj.error_message = error.htmlerrormsg;
+                    this.errorMessage = error.htmlerrormsg;
                 }).then(function () {
-                    thisobj.isCheckingStatus = false;
+                    this.isCheckingStatus = false;
                 });
 
                 /**
                  * Gets the values from git issue page
                  */
-                chrome.tabs.executeScript( null, {code: '(' + getHtmlDom + ')();'}, thisobj.parsePageDocument );
+                chrome.tabs.executeScript( null, {code: '(' + getHtmlDom + ')();'}, this.parsePageDocument );
             },
             markUnknownGitIssue(){
                 this.isCheckingStatus = false;
@@ -167,52 +138,51 @@
             },
             submitOffer(){
                 let form_errors = [];
-                var thisobj= this;
 
-                if (this.formvalues.git_title==="" || typeof this.formvalues.git_title==='undefined') {
+                if (this.form.git_title==="" || typeof this.form.git_title==='undefined') {
                     form_errors.push('We are unable to detect the issue title');
                 }
 
-                /*if (this.formvalues.git_desc==="" || typeof this.formvalues.git_desc==='undefined') {
+                /*if (this.form.git_desc==="" || typeof this.form.git_desc==='undefined') {
                     form_errors.push('We are unable to detect the issue description');
                 }*/
 
-                if (this.formvalues.your_comment==="" || typeof this.formvalues.your_comment==='undefined') {
+                if (this.form.your_comment==="" || typeof this.form.your_comment==='undefined') {
                     form_errors.push('Please enter your message to the funder');
                 }
 
-                let priceamt = parseFloat(this.formvalues.amount);
-                if (this.formvalues.amount==="" || typeof this.formvalues.amount==='undefined' || priceamt<0) {
+                let priceamt = parseFloat(this.form.amount);
+                if (this.form.amount==="" || typeof this.form.amount==='undefined' || priceamt<0) {
                     form_errors.push('Please enter a valid offer amount');
                 }
 
-                if(form_errors.length) {
-                    this.error_message = '<div class="alert alert-danger">';
+                if (form_errors.length) {
+                    this.errorMessage = '<div class="alert alert-danger">';
                     for(var i=0;i< form_errors.length;i++){
-                        this.error_message += form_errors[i]+"<br>";
+                        this.errorMessage += form_errors[i]+"<br>";
                     }
-                    this.error_message += '</div>';
-                }else {
-                    this.error_message = '';
+                    this.errorMessage += '</div>';
+                } else {
+                    this.errorMessage = '';
                     let submitbtn = $('#makeofferform input[type=submit]');
                     var loadingText=submitbtn.html();
                     submitbtn.html('<span class="fa fa-spinner fa-spin"></span> '+ loadingText).attr('disabled', true);
-                    var serialize  = JSON.stringify(this.formvalues);
-                    thisobj.$parent.error_message = '';
+                    var serialize  = JSON.stringify(this.form);
+                    this.$parent.errorMessage = '';
                     http.post('/make-an-offer/submit-offer', serialize,{
 
                     }).then((response) => {
                         //console.log(response);
                         let res = response.data;
                         if(res.status){
-                            thisobj.showForm=false;
-                            thisobj.error_message = "<div class='alert alert-info'>"+res.message+"</div>";
+                            this.showForm=false;
+                            this.errorMessage = "<div class='alert alert-info'>"+res.message+"</div>";
                         }else {
-                            thisobj.error_message = "<div class='alert alert-danger'>"+res.message+"</div>";
+                            this.errorMessage = "<div class='alert alert-danger'>"+res.message+"</div>";
                         }
                     }).catch(function(error) {
                         //console.log(error);
-                        thisobj.$parent.error_message = (error.htmlerrormsg).replace(/\n/g, "<br />");
+                        this.$parent.errorMessage = (error.htmlerrormsg).replace(/\n/g, "<br />");
                     }).then(function () {
                         submitbtn.html(loadingText).attr('disabled', false);
                     });

@@ -1,9 +1,9 @@
 {
   "name": "GitCommits",
-  "version": "1.1.0",
-  "description": "This extension will allow you to submit an offer to complete work outlined in GitHub issue tickets.",
+  "version": "2.0",
+  "description": "GitCommits is a platform that brings Product Owners, Software Developers, and End Users together like never before.",
   "manifest_version": 2,
-  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://gitcommits.test/*"],
+  "permissions": ["storage", "activeTab", "*://*.gitcommits.com/*","*://*.github.com/*","*://*.atlassian.net/*"],
   "background": {
     "scripts": ["variables.js","assets/js/axios.min.js","assets/js/auth_helper.js","init.js"]
   },
@@ -26,13 +26,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://app.gitcommits.com/extension-token", "*://gitcommits.test/extension-token"],
+      "matches": ["*://app.gitcommits.com/extension-token"],
       "js": ["assets/js/contentScript.js"],
       "run_at": "document_end"
     }
   ],
   "externally_connectable": {
-    "matches": ["*://*.gitcommits.com/*","*://gitcommits.test/*"]
+    "matches": ["*://*.gitcommits.com/*"]
   },
   "web_accessible_resources": [
     "assets/images/gitcommits-logo-topdown.png",

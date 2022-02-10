@@ -1,3 +1,4 @@
 {
-    "/dist/popup.js": "/dist/popup.js"
+    "/dist/popup.js": "/dist/popup.js",
+    "/dist/css/dynamic.css": "/dist/css/dynamic.css"
 }

@@ -6,7 +6,7 @@
         <div class="text-center">
             <p class="mt-4 mb-5 make-an-offer-text">Do you want to make an offer?<br>
                 Click on the GitHub button to begin!</p>
-            <a :href="this.$parent.loginurl" target="_blank" class="btn btn-github"><img src="/assets/images/github_logo.png" class="mr-2"/> Log In with GitHub</a>
+            <a :href="this.$root.loginUrl" target="_blank" class="btn btn-github"><img src="/assets/images/github_logo.png" class="mr-2"/> Log In with GitHub</a>
         </div>
     </div>
 </template>
