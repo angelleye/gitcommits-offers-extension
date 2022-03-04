@@ -251,12 +251,13 @@ export default {
     function getHtmlDom() {
       return document.getElementsByTagName('html')[0].innerHTML;
     }
-    if (this.type == 'github') {
+    if (this.type === 'github') {
       this.form.issueUrl = this.tabUrl;
       this.form.gitIssueAction = 'existing';
     } else if (this.isJiraIssue) {
       this.fetchRepoList();
     }
+    this.imageDataForm = new FormData();
     /**
      * Gets the values from git issue page
      */
