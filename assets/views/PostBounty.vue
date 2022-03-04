@@ -178,6 +178,7 @@
         </div>
       </div>
 
+      <div class="alert alert-orange" v-if="errorMessage">{{ errorMessage }}</div>
       <div class="form-group">
         <input type="submit" class="btn btn-primary" :disabled="formProcessing" value="Post Bounty >"/>
       </div>
