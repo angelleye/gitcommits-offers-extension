@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
+    "mime-db": "^1.52.0",
     "parse-github-url": "^1.0.2",
     "turndown": "^7.1.1",
     "vue-select": "^3.16.0"

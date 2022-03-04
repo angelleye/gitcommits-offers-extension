@@ -178,6 +178,7 @@
         </div>
       </div>
 
+      <div class="alert alert-orange" v-if="errorMessage">{{ errorMessage }}</div>
       <div class="form-group">
         <input type="submit" class="btn btn-primary" :disabled="formProcessing" value="Post Bounty >"/>
       </div>
@@ -188,6 +189,7 @@
 <script>
 import http from './../js/http';
 import HtmlParser from './../js/HtmlParser';
+let mimeDB = require('mime-db')
 export default {
   name: "PostBounty",
   props: {
@@ -240,26 +242,43 @@ export default {
         experience: 'Beginner',
         issueType: 'Bug',
         amount: 10,
-        containsPrivateIssues: false
-      }
+        containsPrivateIssues: false,
+        fileUrlMappings: {}
+      },
+      imageDataForm: null
     }
   },
   created() {
     function getHtmlDom() {
       return document.getElementsByTagName('html')[0].innerHTML;
     }
-    if (this.type == 'github') {
+    if (this.type === 'github') {
       this.form.issueUrl = this.tabUrl;
       this.form.gitIssueAction = 'existing';
     } else if (this.isJiraIssue) {
       this.fetchRepoList();
     }
+    this.imageDataForm = new FormData();
     /**
      * Gets the values from git issue page
      */
     chrome.tabs.executeScript( null, {code: '(' + getHtmlDom + ')();'}, this.parsePageDocument );
   },
   methods: {
+    parseImageUrls (string) {
+      const regex = /!\[(.*?)\]\((.*?)\)/g;
+      let m;
+      let allUrls = [];
+      while ((m = regex.exec(string)) !== null) {
+        if (m.index === regex.lastIndex) {
+          regex.lastIndex++;
+        }
+        let url = m[2];
+        let split = url.split(".");
+        allUrls.push({name: m[1] + "." + split[split.length-1], url: url});
+      }
+      return allUrls;
+    },
     parsePageDocument(results){
       let html = results[0];
       if (this.isJiraIssue) {
@@ -267,6 +286,23 @@ export default {
         if (jiraData) {
           this.form.title =  (this.urlParts.pathname).replace('browse/', '') + ' - ' + jiraData.title;
           this.form.desc = jiraData.desc;
+
+          this.imageDataForm = new FormData()
+          this.form.fileUrlMappings = [];
+          let images = this.parseImageUrls(this.form.desc);
+          Object.keys(images).forEach((index) => {
+            let url = images[index].url;
+            fetch(url).then((response) => {
+              return response.blob();
+            }).then((myBlob) => {
+              let data = mimeDB[myBlob.type];
+              if (data && data.extensions.length) {
+                this.form.fileUrlMappings.push(url);
+                this.imageDataForm.append('jira_image_' + index + '.' + data.extensions[0], myBlob, 'jira_image_' + index + '.' + data.extensions[0]);
+              }
+              //this.imageData = URL.createObjectURL(myBlob);
+            });
+          });
           return;
         }
       } else {
@@ -357,9 +393,19 @@ export default {
         return false;
       }
 
+      let config = {
+        header : {
+          'Content-Type' : 'multipart/form-data'
+        }
+      }
+
+      Object.keys(this.form).forEach((index) => {
+        this.imageDataForm.append(index, this.form[index]);
+      });
+
       this.error_message = '';
       this.formProcessing = true;
-      http.post('/post-bounty', this.form).then((response) => {
+      http.post('/post-bounty', this.imageDataForm, config).then((response) => {
         console.log(response);
         let res = response.data;
         if (res.status) {
